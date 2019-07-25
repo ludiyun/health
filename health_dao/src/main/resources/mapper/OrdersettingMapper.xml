@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--namespace:为接口的全路径-->
+<mapper namespace="com.itheima.dao.OrdersettingMapper">
+
+<!--    CREATE TABLE `t_ordersetting` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `orderDate` date DEFAULT NULL COMMENT '约预日期',
+  `number` int(11) DEFAULT NULL COMMENT '可预约人数',
+  `reservations` int(11) DEFAULT NULL COMMENT '已预约人数',-->
+    <!--查詢-->
+<select id="findNumberByDate" resultType="int">
+    select count(*) from t_ordersetting where orderDate=#{orderDate}
+</select>
+
+    <!--编辑-->
+    <update id="updateNumberByDate" parameterType="com.itheima.pojo.OrderSetting">
+    update t_ordersetting set number=#{number} where orderDate=#{orderDate}
+    </update>
+
+    <insert id="add" parameterType="com.itheima.pojo.OrderSetting">
+        insert into t_ordersetting (orderDate,number) values
+        (#{orderDate},#{number})
+    </insert>
+
+    <select id="getOrderSettingByMonth" resultType="com.itheima.pojo.OrderSetting">
+        select * from t_ordersetting where orderDate like  #{month} '%'
+    </select>
+
+    <!--查询已预约人数和可预约人数-->
+    <select id="findByDate" resultType="com.itheima.pojo.OrderSetting">
+        select number,reservations,orderDate,version from t_ordersetting where orderDate=#{orderDate}
+    </select>
+
+
+<!-- 更新可预约人数-->
+<update id="updateReservationsByorderDate" parameterType="com.itheima.pojo.OrderSetting">
+    update t_ordersetting set  reservations=reservations+1,version=version+1 where orderDate=#{orderDate} and version=#{version}
+</update>
+
+</mapper>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--namespace:为接口的全路径-->
+<mapper namespace="com.itheima.dao.SetmealMapper">
+    <select id="findPage" resultType="com.itheima.pojo.Setmeal">
+        select * from t_setmeal
+        <if test="queryString!=null and queryString.length>0">
+            where name=#{queryString} or code=#{queryString} or helpCode=#{queryString}
+        </if>
+    </select>
+
+    <insert id="add" parameterType="com.itheima.pojo.Setmeal" useGeneratedKeys="true" keyProperty="id">
+     insert into t_setmeal
+      		(code,name,sex,age,helpCode,price,remark,attention,img)
+        		values
+      		(#{code},#{name},#{sex},#{age},#{helpCode},#{price},#{remark},#{attention},#{img})
+    </insert>
+
+    <insert id="setSetmealAndCheckgroup">
+        insert into t_setmeal_checkgroup(setmeal_id,checkgroup_id) values
+        <foreach collection="batchParam" item="item" separator=",">
+            (
+            #{item.setmealId},
+            #{item.checkgroupId}
+            )
+        </foreach>
+    </insert>
+
+    <!--查询所有套餐列表数据-->
+    <select id="findAllsetmeal" resultType="com.itheima.pojo.Setmeal">
+select * from t_setmeal
+
+    </select>
+
+    <!--查询套餐详情-->
+    <select id="findsetmealDetailsById" resultType="com.itheima.pojo.Setmeal">
+        select * from t_setmeal where id=#{id}
+    </select>
+
+    <!--查询所有检查组-->
+    <select id="findCheckGroupById" resultType="com.itheima.pojo.CheckGroup">
+        select ck.* from t_setmeal_checkgroup sck,t_checkgroup ck where sck.checkgroup_id=ck.id and sck.setmeal_id=#{id}
+    </select>
+
+    <!--查询检查项-->
+    <select id="findAllCheckItem" resultType="com.itheima.pojo.CheckItem">
+select * from t_checkitem where id in
+(select checkitem_id from t_checkgroup_checkitem where checkgroup_id in (#{checkGroupId}))
+
+    </select>
+
+    <!--根据检查组查询所有检查项-->
+    <select id="findCheckItemsByBeachId" resultType="com.itheima.pojo.CheckItem">
+        select ck.*,cck.checkgroup_id checkGroupId from t_checkgroup_checkitem cck,t_checkitem ck
+        where cck.checkitem_id=ck.id and cck.checkgroup_id in
+        <foreach collection="checkGroupIds" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+    <!--查询套餐信息-->
+    <select id="findDetailById" resultType="com.itheima.pojo.Setmeal">
+        select name,sex,age,remark from t_setmeal where id=#{id}
+    </select>
+</mapper>

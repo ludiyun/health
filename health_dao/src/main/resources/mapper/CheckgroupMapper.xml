@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itheima.dao.CheckgroupMapper">
+
+    <!--新增检查组-->
+
+    <!--CREATE TABLE `t_checkgroup` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `code` varchar(32) DEFAULT NULL,
+  `name` varchar(32) DEFAULT NULL,
+  `helpCode` varchar(32) DEFAULT NULL,
+  `sex` char(1) DEFAULT NULL,
+  `remark` varchar(128) DEFAULT NULL,
+  `attention` varchar(128) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8;
+-->
+    <insert id="add" parameterType="com.itheima.pojo.CheckGroup" useGeneratedKeys="true" keyProperty="id">
+        insert into t_checkgroup(code,name,helpCode,sex,remark,attention)
+        values (
+        #{code},
+        #{name},
+        #{helpCode},
+        #{sex},
+        #{remark},
+        #{attention}
+        )
+
+    </insert>
+
+<!--保存检查组和检查项-->
+    <!--一定要加括号 注意:values要写在上面-->
+<insert id="setcheckgroupAndcheckitem">
+    insert into t_checkgroup_checkitem(checkgroup_id,checkitem_id) values
+    <foreach collection="batchParam" item="item" separator=",">
+     (#{item.checkgroupId},#{item.checkitemId})
+    </foreach>
+</insert>
+
+    <!--分页查询-->
+    <select id="findPage" resultType="com.itheima.pojo.CheckGroup">
+        select * from t_checkgroup
+
+        <if test="queryString!=null and queryString.length>0">
+            where code=#{queryString} or name=#{queryString} or helpCode=#{queryString}
+        </if>
+    </select>
+
+<!--       1:根据检查组id查询检查组信息-->
+    <select id="findById" resultType="com.itheima.pojo.CheckGroup">
+        select * from t_checkgroup where id=#{id}
+    </select>
+
+
+<!--    3:根据检查组id查询被勾选的检查项信息-->
+    <select id="findcheckgroupAndcheckitem" resultType="int">
+        select checkitem_id from t_checkgroup_checkitem where checkgroup_id = #{checkGroupId}
+
+    </select>
+<!-- `id` int(11) NOT NULL AUTO_INCREMENT,
+  `code` varchar(32) DEFAULT NULL,
+  `name` varchar(32) DEFAULT NULL,
+  `helpCode` varchar(32) DEFAULT NULL,
+  `sex` char(1) DEFAULT NULL,
+  `remark` varchar(128) DEFAULT NULL,
+  `attention` varchar(128) DEFAULT NULL,-->
+    <!--编辑-->
+    <update id="edit" parameterType="com.itheima.pojo.CheckGroup">
+        update t_checkgroup
+        <set>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="sex != null">
+                sex = #{sex},
+            </if>
+            <if test="code != null">
+                code = #{code},
+            </if>
+            <if test="helpCode != null">
+                helpCode = #{helpCode},
+            </if>
+            <if test="attention != null">
+                attention = #{attention},
+            </if>
+            <if test="remark != null">
+                remark = #{remark},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--删除中间表的关系-->
+    <delete id="deleteAssociation" parameterType="int">
+  delete from t_checkgroup_checkitem where checkgroup_id = #{id}
+</delete>
+
+    <insert id="setcheckgroupAndcheckitemEdit">
+        insert into t_checkgroup_checkitem values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.checkGroupId}, #{item.checkitemId})
+        </foreach>
+    </insert>
+
+    <select id="fingAll" resultType="com.itheima.pojo.CheckGroup">
+        select * from t_checkgroup;
+    </select>
+</mapper>

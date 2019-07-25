@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+							http://www.springframework.org/schema/beans/spring-beans.xsd
+							http://www.springframework.org/schema/mvc
+							http://www.springframework.org/schema/mvc/spring-mvc.xsd
+							http://code.alibabatech.com/schema/dubbo
+							http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+							http://www.springframework.org/schema/context
+							http://www.springframework.org/schema/context/spring-context.xsd">
+<!--    <context:annotation-config/>-->
+<!--//任务-->
+    <!--自己的任务-->
+
+    <bean class="it.heima.com.ClearImgJob" id="clearImgJob"></bean>
+    <!--任务-->
+    <bean id="jobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+    <!--告诉类-->
+    <property name="targetObject" ref="clearImgJob"/>
+    <!--告诉方法-->
+    <property name="targetMethod" value="clearImg"/>
+
+    </bean>
+    <!--触发器-->
+<bean id="myTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+<!--告诉触发器要执行的任务-->
+    <property name="jobDetail" ref="jobDetail"/>
+<property name="cronExpression">
+    <!--指定触发的时间-->
+    <value>0 0 2 * * ?</value>
+</property>
+</bean>
+<!--调度器-->
+    <bean id="scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <!--注入多个触发器-->
+        <property name="triggers">
+            <list>
+                <ref bean="myTrigger"/>
+            </list>
+        </property>
+
+
+    </bean>
+
+
+</beans>
+
